@@ -17,6 +17,7 @@ import ko from "./ko";
 import ar from "./ar";
 import bn from "./bn";
 import sk from "./sk";
+import sk from "./fa";
 import { merge } from "../utils/merge";
 import { safeLocalStorage } from "@/app/utils";
 
@@ -45,6 +46,7 @@ const ALL_LANGS = {
   ar,
   bn,
   sk,
+  fa,
 };
 
 export type Lang = keyof typeof ALL_LANGS;
@@ -69,6 +71,7 @@ export const ALL_LANG_OPTIONS: Record<Lang, string> = {
   cs: "Čeština",
   no: "Nynorsk",
   ar: "العربية",
+  fa: "فارسی",
   bn: "বাংলা",
   sk: "Slovensky",
 };
@@ -154,6 +157,7 @@ export const STT_LANG_MAP: Record<Lang, string> = {
   cs: "cs-CZ",
   no: "no-NO",
   ar: "ar-SA",
+  fa: "fa-IR",
   bn: "bn-BD",
   sk: "sk-SK",
 };
