@@ -17,6 +17,7 @@ import ko from "./ko";
 import ar from "./ar";
 import bn from "./bn";
 import sk from "./sk";
+import fa from "./fa";
 import { merge } from "../utils/merge";
 import { safeLocalStorage } from "@/app/utils";
 
@@ -45,6 +46,7 @@ const ALL_LANGS = {
   ar,
   bn,
   sk,
+  fa,
 };
 
 export type Lang = keyof typeof ALL_LANGS;
@@ -71,6 +73,7 @@ export const ALL_LANG_OPTIONS: Record<Lang, string> = {
   ar: "العربية",
   bn: "বাংলা",
   sk: "Slovensky",
+  fa: "فارسی",
 };
 
 const LANG_KEY = "lang";
@@ -156,6 +159,7 @@ export const STT_LANG_MAP: Record<Lang, string> = {
   ar: "ar-SA",
   bn: "bn-BD",
   sk: "sk-SK",
+  fa: "fa-IR",
 };
 
 export function getSTTLang(): string {
