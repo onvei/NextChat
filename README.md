@@ -188,6 +188,14 @@ Your openai api key, join multiple api keys with comma.
 
 Override openai api request base url.
 
+### `DATABASE_URL` (required)
+
+PostgreSQL connection string for Prisma. Example:
+
+```
+DATABASE_URL=postgresql://user:password@localhost:5432/nextchat
+```
+
 ### `OPENAI_ORG_ID` (optional)
 
 Specify OpenAI organization ID.
@@ -390,6 +398,9 @@ OPENAI_API_KEY=<your api key here>
 
 # if you are not able to access openai service, use this BASE_URL
 BASE_URL=https://chatgpt1.nextweb.fun/api/proxy
+
+# database connection
+DATABASE_URL=postgresql://user:password@localhost:5432/nextchat
 ```
 
 ### Local Development
@@ -399,6 +410,7 @@ BASE_URL=https://chatgpt1.nextweb.fun/api/proxy
 # 2. config local env vars in `.env.local`
 # 3. run
 yarn install
+npx prisma migrate dev
 yarn dev
 ```
 

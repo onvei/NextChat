@@ -33,6 +33,57 @@ export const Models = ["gpt-3.5-turbo", "gpt-4"] as const;
 export const TTSModels = ["tts-1", "tts-1-hd"] as const;
 export type ChatModel = ModelType;
 
+let authToken: string | null = null;
+
+export function setAuthToken(token: string) {
+  authToken = token;
+  if (typeof window !== "undefined") {
+    localStorage.setItem("authToken", token);
+  }
+}
+
+export function getAuthToken() {
+  if (!authToken && typeof window !== "undefined") {
+    authToken = localStorage.getItem("authToken");
+  }
+  return authToken;
+}
+
+export async function apiFetch(input: RequestInfo, init: RequestInit = {}) {
+  const token = getAuthToken();
+  const headers = new Headers(init.headers);
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+  return fetch(input, { ...init, headers });
+}
+
+export async function login(email: string, password: string) {
+  const res = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!res.ok) {
+    throw new Error("Login failed");
+  }
+  const data = await res.json();
+  setAuthToken(data.token);
+  return data.token as string;
+}
+
+export async function register(email: string, password: string) {
+  const res = await fetch("/api/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!res.ok) {
+    throw new Error("Register failed");
+  }
+  return res.json();
+}
+
 export interface MultimodalContent {
   type: "text" | "image_url";
   text?: string;
