@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { showToast } from "./components/ui-lib";
-import Locale from "./locales";
 import { RequestMessage } from "./client/api";
 import {
   REQUEST_TIMEOUT_MS,
@@ -9,9 +8,13 @@ import {
 } from "./constant";
 // import { fetch as tauriFetch, ResponseType } from "@tauri-apps/api/http";
 import { fetch as tauriStreamFetch } from "./utils/stream";
-import { VISION_MODEL_REGEXES, EXCLUDE_VISION_MODEL_REGEXES } from "./constant";
-import { useAccessStore } from "./store";
 import { ModelSize } from "./typing";
+
+async function getLocale() {
+  return (await import("./locales")).default;
+}
+
+export { isVisionModel } from "./is-vision-model";
 
 export function trimTopic(topic: string) {
   // Fix an issue where double quotes still show in the Indonesian language
@@ -26,6 +29,7 @@ export function trimTopic(topic: string) {
 }
 
 export async function copyToClipboard(text: string) {
+  const Locale = await getLocale();
   try {
     if (window.__TAURI__) {
       window.__TAURI__.writeText(text);
@@ -51,6 +55,7 @@ export async function copyToClipboard(text: string) {
 }
 
 export async function downloadAs(text: string, filename: string) {
+  const Locale = await getLocale();
   if (window.__TAURI__) {
     const result = await window.__TAURI__.dialog.save({
       defaultPath: `${filename}`,
@@ -280,18 +285,6 @@ export function getMessageImages(message: RequestMessage): string[] {
   return urls;
 }
 
-export function isVisionModel(model: string) {
-  const visionModels = useAccessStore.getState().visionModels;
-  const envVisionModels = visionModels?.split(",").map((m) => m.trim());
-  if (envVisionModels?.includes(model)) {
-    return true;
-  }
-  return (
-    !EXCLUDE_VISION_MODEL_REGEXES.some((regex) => regex.test(model)) &&
-    VISION_MODEL_REGEXES.some((regex) => regex.test(model))
-  );
-}
-
 export function isDalle3(model: string) {
   return "dall-e-3" === model;
 }
@@ -446,27 +439,28 @@ export function getOperationId(operation: {
   );
 }
 
-export function clientUpdate() {
-  // this a wild for updating client app
-  return window.__TAURI__?.updater
-    .checkUpdate()
-    .then((updateResult) => {
-      if (updateResult.shouldUpdate) {
-        window.__TAURI__?.updater
-          .installUpdate()
-          .then((result) => {
-            showToast(Locale.Settings.Update.Success);
-          })
-          .catch((e) => {
-            console.error("[Install Update Error]", e);
-            showToast(Locale.Settings.Update.Failed);
-          });
+export async function clientUpdate() {
+  const updater = window.__TAURI__?.updater;
+  if (!updater) return;
+
+  try {
+    const updateResult = await updater.checkUpdate();
+    if (updateResult.shouldUpdate) {
+      try {
+        await updater.installUpdate();
+        const Locale = await getLocale();
+        showToast(Locale.Settings.Update.Success);
+      } catch (e) {
+        console.error("[Install Update Error]", e);
+        const Locale = await getLocale();
+        showToast(Locale.Settings.Update.Failed);
       }
-    })
-    .catch((e) => {
-      console.error("[Check Update Error]", e);
-      showToast(Locale.Settings.Update.Failed);
-    });
+    }
+  } catch (e) {
+    console.error("[Check Update Error]", e);
+    const Locale = await getLocale();
+    showToast(Locale.Settings.Update.Failed);
+  }
 }
 
 // https://gist.github.com/iwill/a83038623ba4fef6abb9efca87ae9ccb
