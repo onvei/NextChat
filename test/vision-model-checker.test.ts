@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { isVisionModel } from "../app/utils";
+import { isVisionModel } from "../app/is-vision-model";
 
 describe("isVisionModel", () => {
   const originalEnv = process.env;

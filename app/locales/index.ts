@@ -20,10 +20,43 @@ import bn from "./bn";
 import sk from "./sk";
 import fa from "./fa";
 import { merge } from "../utils/merge";
-import { safeLocalStorage } from "@/app/utils";
 
 import type { LocaleType } from "./cn";
 export type { LocaleType, PartialLocaleType } from "./cn";
+
+function safeLocalStorage(): {
+  getItem: (key: string) => string | null;
+  setItem: (key: string, value: string) => void;
+  removeItem: (key: string) => void;
+  clear: () => void;
+} {
+  let storage: Storage | null;
+
+  try {
+    if (typeof window !== "undefined" && window.localStorage) {
+      storage = window.localStorage;
+    } else {
+      storage = null;
+    }
+  } catch {
+    storage = null;
+  }
+
+  return {
+    getItem(key: string) {
+      return storage ? storage.getItem(key) : null;
+    },
+    setItem(key: string, value: string) {
+      storage?.setItem(key, value);
+    },
+    removeItem(key: string) {
+      storage?.removeItem(key);
+    },
+    clear() {
+      storage?.clear();
+    },
+  };
+}
 
 const localStorage = safeLocalStorage();
 
